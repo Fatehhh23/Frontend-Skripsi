@@ -1,31 +1,32 @@
 // src/types/index.ts
-// Export semua types dari file terpisah
 
+// Export tipe spesifik dari file lain
 export * from './simulation';
 export * from './map';
 export * from './api';
 
-// Common types
+// --- Tipe Umum / Shared ---
+
+// Definisi User (Untuk AuthContext)
 export interface User {
-  id: string;
+  id?: string;
   email: string;
   name: string;
   role?: 'admin' | 'user';
+  avatar?: string;
 }
 
+// Tipe untuk error validasi form
 export interface ValidationError {
   field: string;
   message: string;
 }
 
-export interface PaginationParams {
-  page: number;
-  limit: number;
+// Tipe untuk opsi Dropdown/Select
+export interface SelectOption {
+  label: string;
+  value: string | number;
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
+// Status loading aplikasi
+export type LoadingState = 'idle' | 'loading' | 'success' | 'error';

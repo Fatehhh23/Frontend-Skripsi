@@ -1,0 +1,41 @@
+/* src/styles/globals.css */
+
+/* Animasi Fade In untuk komponen yang baru muncul */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Animasi Pulse lembut untuk indikator status */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Reset focus ring untuk aksesibilitas yang lebih rapi */
+:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Memastikan Map container selalu mengisi ruang yang tersedia */
+.map-container {
+  @apply w-full h-full relative overflow-hidden rounded-xl bg-slate-100;
+}

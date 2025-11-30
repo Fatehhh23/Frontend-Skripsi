@@ -1,120 +1,93 @@
-// constants/tsunamiConfig.ts
-// Konfigurasi konstanta sesuai penelitian di Selat Sunda
+// src/constants/tsunamiConfig.ts
 
+// Batas Geografis Wilayah Studi (Selat Sunda)
 export const SUNDA_STRAIT_BOUNDS = {
   center: {
     latitude: -6.1,
     longitude: 105.4
   },
-  zoom: {
-    default: 9,
-    detail: 11,
-    overview: 7
+  // Batas kotak (Bounding Box) untuk validasi input koordinat
+  bounds: {
+    north: -5.0, // Lampung Utara (sekitar)
+    south: -7.5, // Ujung Kulon / Laut Jawa
+    west: 104.0, // Arah Samudra Hindia
+    east: 106.5  // Arah Jakarta
   }
 };
 
-// Ambang batas risiko tsunami berdasarkan penelitian
+// Ambang Batas Risiko Tsunami (Scientific Thresholds)
+// Digunakan untuk menentukan logika warna dan peringatan
 export const TSUNAMI_RISK_THRESHOLDS = {
   magnitude: {
-    low: 5.5,
-    medium: 6.5,
-    high: 7.0,
-    critical: 7.5
+    low: 5.5,      // < 5.5: Kecil kemungkinan tsunami
+    medium: 6.5,   // 6.5: Potensi tsunami lokal
+    high: 7.0,     // 7.0: Potensi tsunami merusak
+    critical: 7.5  // > 7.5: Potensi tsunami besar (Megathrust)
   },
   depth: {
-    shallow: 30,  // < 30km = dangkal
-    medium: 70,   // 30-70km = sedang
-    deep: 100     // > 100km = dalam
+    shallow: 30,  // < 30km: Gempa Dangkal (Sangat Berbahaya)
+    medium: 70,   // 30-70km: Gempa Menengah
+    deep: 100     // > 100km: Gempa Dalam (Risiko tsunami kecil)
   },
   waveHeight: {
-    safe: 0.5,      // < 0.5m = aman
-    warning: 1.0,   // 0.5-1m = waspada
-    alert: 2.0,     // 1-2m = siaga
-    danger: 3.0     // > 3m = bahaya
+    safe: 0.5,      // < 0.5m: Aman/Waspada kecil
+    warning: 1.0,   // 0.5 - 1.0m: Waspada (Jauhi pantai)
+    alert: 3.0,     // 1.0 - 3.0m: Siaga (Evakuasi)
+    danger: 3.0     // > 3.0m: Awas (Evakuasi Menyeluruh)
   }
 };
 
-// Zona risiko Selat Sunda (berdasarkan penelitian)
+// Zona Risiko Utama di Selat Sunda (Data Statis untuk Visualisasi Awal)
+// Koordinat ini membentuk poligon area pantai yang rentan
 export const RISK_ZONES = [
   {
-    id: 'zone_1',
-    name: 'Pesisir Banten (Pantai Anyer - Carita)',
+    id: 'zone_anyer_carita',
+    name: 'Pesisir Banten (Anyer - Carita)',
+    description: 'Kawasan wisata padat penduduk dengan topografi landai.',
+    baseRisk: 'high',
     coordinates: [
       [105.8, -6.0],
       [105.9, -6.0],
       [105.9, -6.2],
       [105.8, -6.2]
     ],
-    baseRisk: 'high'
   },
   {
-    id: 'zone_2',
-    name: 'Pesisir Lampung Selatan',
+    id: 'zone_lampung_selatan',
+    name: 'Pesisir Lampung Selatan (Kalianda)',
+    description: 'Wilayah pesisir yang berhadapan langsung dengan Anak Krakatau.',
+    baseRisk: 'high',
     coordinates: [
-      [105.3, -5.7],
-      [105.5, -5.7],
-      [105.5, -5.9],
-      [105.3, -5.9]
+      [105.5, -5.6],
+      [105.7, -5.6],
+      [105.7, -5.9],
+      [105.5, -5.9]
     ],
-    baseRisk: 'high'
   },
   {
-    id: 'zone_3',
-    name: 'Krakatau dan sekitarnya',
+    id: 'zone_krakatau',
+    name: 'Kompleks G. Anak Krakatau',
+    description: 'Pusat aktivitas vulkanik, zona bahaya utama longsoran bawah laut.',
+    baseRisk: 'critical',
     coordinates: [
-      [105.4, -6.1],
-      [105.5, -6.1],
-      [105.5, -6.2],
-      [105.4, -6.2]
+      [105.35, -6.05],
+      [105.48, -6.05],
+      [105.48, -6.18],
+      [105.35, -6.18]
     ],
-    baseRisk: 'critical'
   }
 ];
 
-// Parameter model CNN (sesuai skripsi)
+// Konfigurasi Teknis Model AI & Polling
 export const MODEL_CONFIG = {
   endpoint: '/api/v1/simulate',
   realTimeEndpoint: '/api/v1/realtime',
-  timeout: 30000, // 30 detik
-  retryAttempts: 3
+  timeout: 30000, // Timeout request 30 detik
+  retryAttempts: 3 // Coba ulang 3x jika gagal
 };
 
-// Interval pembaruan data real-time
+// Interval Update Otomatis (dalam milidetik)
 export const UPDATE_INTERVALS = {
-  realTime: 60000,      // 1 menit
-  earthquakeAPI: 300000 // 5 menit
-};
-
-// Status peringatan
-export const WARNING_LEVELS = {
-  NORMAL: {
-    label: 'Normal',
-    color: '#10b981',
-    bgColor: '#d1fae5',
-    description: 'Tidak ada ancaman tsunami'
-  },
-  WASPADA: {
-    label: 'Waspada',
-    color: '#f59e0b',
-    bgColor: '#fef3c7',
-    description: 'Potensi tsunami rendah, tetap waspada'
-  },
-  SIAGA: {
-    label: 'Siaga',
-    color: '#f97316',
-    bgColor: '#ffedd5',
-    description: 'Potensi tsunami sedang, siapkan evakuasi'
-  },
-  AWAS: {
-    label: 'Awas',
-    color: '#dc2626',
-    bgColor: '#fee2e2',
-    description: 'Bahaya tsunami tinggi, evakuasi segera!'
-  }
-};
-
-// Sumber data eksternal
-export const EXTERNAL_APIS = {
-  BMKG: 'https://data.bmkg.go.id/DataMKG/TEWS/',
-  USGS: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson'
+  realTime: 60000,      // Cek status tiap 1 menit
+  earthquakeAPI: 300000 // Tarik data gempa eksternal tiap 5 menit
 };

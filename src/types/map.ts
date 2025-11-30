@@ -1,11 +1,18 @@
 // src/types/map.ts
-// Types untuk komponen peta
 
+// Koordinat dasar
 export interface Coordinate {
   latitude: number;
   longitude: number;
 }
 
+// Konfigurasi tampilan awal peta
+export interface MapViewState {
+  center: [number, number]; // [Longitude, Latitude] - Format ArcGIS
+  zoom: number;
+}
+
+// Batas wilayah (Bounding Box)
 export interface MapBounds {
   north: number;
   south: number;
@@ -13,41 +20,19 @@ export interface MapBounds {
   west: number;
 }
 
-export interface RiskZone {
+// Struktur data untuk Zona Risiko (Polygon statis)
+export interface RiskZoneLayer {
   id: string;
   name: string;
-  coordinates: Coordinate[];
-  baseRisk: 'low' | 'medium' | 'high' | 'critical';
-  population?: number;
   description?: string;
+  baseRisk: 'low' | 'medium' | 'high' | 'critical';
+  coordinates: number[][]; // Array of [lon, lat] arrays
 }
 
-export interface EpicenterMarkerProps {
+// Props untuk marker episentrum gempa
+export interface EpicenterMarker {
   coordinate: Coordinate;
   magnitude: number;
   depth: number;
-  riskLevel?: string;
-}
-
-export interface MapLayerConfig {
-  id: string;
-  visible: boolean;
-  opacity: number;
-  zIndex: number;
-}
-
-export interface MapViewState {
-  center: Coordinate;
-  zoom: number;
-  rotation?: number;
-  pitch?: number;
-}
-
-export interface GeoJSONFeature {
-  type: 'Feature';
-  geometry: {
-    type: 'Point' | 'LineString' | 'Polygon';
-    coordinates: number[] | number[][] | number[][][];
-  };
-  properties: Record<string, any>;
+  isActive: boolean; // True jika ini gempa yang sedang dipilih
 }

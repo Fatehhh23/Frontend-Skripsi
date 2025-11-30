@@ -1,89 +1,45 @@
 // src/utils/validators.ts
-// Fungsi validasi untuk input
 
-import { SimulationParams } from '../types';
-import { TSUNAMI_RISK_THRESHOLDS, SUNDA_STRAIT_BOUNDS } from '../constants/tsunamiConfig';
+import { SimulationParams } from '../types/simulation';
+import { SUNDA_STRAIT_BOUNDS } from '../constants/tsunamiConfig';
 
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
 }
 
+/**
+ * Memvalidasi seluruh parameter input simulasi
+ */
 export const validateSimulationParams = (params: SimulationParams): ValidationResult => {
   const errors: string[] = [];
+  const { latitude, longitude } = SUNDA_STRAIT_BOUNDS.bounds;
 
-  // Validasi magnitude
-  if (params.magnitude < 4.0 || params.magnitude > 10.0) {
-    errors.push('Magnitudo harus antara 4.0 - 10.0 Skala Richter');
+  // 1. Validasi Magnitudo
+  if (!params.magnitude || params.magnitude < 4.0 || params.magnitude > 10.0) {
+    errors.push('Magnitudo harus diisi antara 4.0 hingga 10.0 SR.');
   }
 
-  // Validasi depth
-  if (params.depth < 0 || params.depth > 700) {
-    errors.push('Kedalaman harus antara 0 - 700 km');
+  // 2. Validasi Kedalaman
+  if (params.depth === undefined || params.depth < 0 || params.depth > 700) {
+    errors.push('Kedalaman harus diisi antara 0 hingga 700 km.');
   }
 
-  // Validasi latitude (Selat Sunda)
-  if (params.latitude < -7.0 || params.latitude > -5.0) {
-    errors.push('Lintang harus dalam area Selat Sunda (-7.0° hingga -5.0°)');
-  }
+  // 3. Validasi Batas Wilayah (Geofencing)
+  // Memastikan koordinat berada dalam area studi Selat Sunda untuk akurasi model
+  const isLatValid = params.latitude <= latitude.north && params.latitude >= latitude.south;
+  const isLonValid = params.longitude >= longitude.west && params.longitude <= longitude.east;
 
-  // Validasi longitude (Selat Sunda)
-  if (params.longitude < 104.5 || params.longitude > 106.5) {
-    errors.push('Bujur harus dalam area Selat Sunda (104.5° hingga 106.5°)');
-  }
-
-  // Cek koordinat 0,0 (kemungkinan belum diisi)
-  if (params.latitude === 0 && params.longitude === 0) {
-    errors.push('Silakan pilih lokasi episentrum pada peta atau isi koordinat manual');
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-};
-
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const validatePassword = (password: string): ValidationResult => {
-  const errors: string[] = [];
-
-  if (password.length < 8) {
-    errors.push('Password minimal 8 karakter');
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password harus mengandung huruf kapital');
-  }
-
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password harus mengandung huruf kecil');
-  }
-
-  if (!/[0-9]/.test(password)) {
-    errors.push('Password harus mengandung angka');
+  if (!isLatValid || !isLonValid) {
+    errors.push(
+      `Lokasi di luar area studi Selat Sunda. 
+      (Lat: ${latitude.south} s.d ${latitude.north}, 
+      Lon: ${longitude.west} s.d ${longitude.east})`
+    );
   }
 
   return {
     valid: errors.length === 0,
     errors,
   };
-};
-
-export const isCoordinateInSundaStrait = (lat: number, lon: number): boolean => {
-  return (
-    lat >= -7.0 &&
-    lat <= -5.0 &&
-    lon >= 104.5 &&
-    lon <= 106.5
-  );
-};
-
-export const isTsunamigenicEarthquake = (magnitude: number, depth: number): boolean => {
-  // Gempa tsunamigenik: magnitude > 6.5 dan kedalaman < 100km
-  return magnitude >= TSUNAMI_RISK_THRESHOLDS.magnitude.medium && 
-         depth <= TSUNAMI_RISK_THRESHOLDS.depth.deep;
 };

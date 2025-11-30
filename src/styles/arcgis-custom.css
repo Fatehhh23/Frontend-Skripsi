@@ -1,0 +1,50 @@
+/* src/styles/arcgis-custom.css */
+
+/* Menghilangkan outline fokus default ArcGIS saat peta diklik */
+.esri-view {
+  outline: none !important;
+}
+
+.esri-view .esri-view-surface--inset-outline:focus::after {
+  outline: none !important;
+}
+
+/* Kustomisasi Popup ArcGIS agar senada dengan Tailwind (Rounded & Shadow) */
+.esri-popup__main-container {
+  @apply rounded-xl shadow-xl border border-slate-100 !important;
+}
+
+.esri-popup__header {
+  @apply bg-slate-50 border-b border-slate-100 rounded-t-xl pt-3 pb-2 !important;
+}
+
+.esri-popup__header-title {
+  @apply font-bold text-slate-800 !important;
+}
+
+.esri-popup__content {
+  @apply text-slate-600 text-sm leading-relaxed !important;
+}
+
+.esri-popup__footer {
+  @apply hidden !important; /* Menyembunyikan footer default yang jarang dipakai */
+}
+
+/* Memindahkan posisi atribusi (Copyright map) agar tidak menutupi data */
+.esri-attribution {
+  @apply bg-white/80 backdrop-blur-sm text-xs text-slate-500 !important;
+}
+
+/* Kustomisasi tombol Widget (Zoom, Home, dll) */
+.esri-widget--button {
+  @apply bg-white text-slate-600 border border-slate-200 rounded-lg shadow-sm w-8 h-8 flex items-center justify-center transition-all !important;
+}
+
+.esri-widget--button:hover {
+  @apply bg-slate-50 text-blue-600 border-blue-200 !important;
+}
+
+/* Menyembunyikan elemen yang tidak perlu jika ingin tampilan bersih */
+.esri-component.esri-logo {
+  display: none !important; /* Opsional: Sembunyikan logo 'Powered by Esri' jika diizinkan lisensi */
+}

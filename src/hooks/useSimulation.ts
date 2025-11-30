@@ -1,84 +1,58 @@
-// hooks/useSimulation.ts
-// Custom hook untuk manajemen state simulasi
-
-import { useState, useCallback } from 'react';
+// src/hooks/useSimulation.ts
+import { useState } from 'react';
 import { SimulationParams, SimulationResult } from '../types';
 import { simulationService } from '../services/simulationService';
+import { validateSimulationParams } from '../utils/validators';
 
-interface UseSimulationReturn {
-  params: SimulationParams;
-  result: SimulationResult | null;
-  loading: boolean;
-  error: string | null;
-  updateParams: (updates: Partial<SimulationParams>) => void;
-  runSimulation: () => Promise<void>;
-  resetSimulation: () => void;
-  validationErrors: string[];
-}
-
-export const useSimulation = (): UseSimulationReturn => {
-  const [params, setParams] = useState<SimulationParams>({
-    magnitude: 0,
-    depth: 0,
-    latitude: 0,
-    longitude: 0
-  });
-
-  const [result, setResult] = useState<SimulationResult | null>(null);
+export const useSimulation = () => {
+  // State untuk menyimpan hasil simulasi, status loading, dan error
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<SimulationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const updateParams = useCallback((updates: Partial<SimulationParams>) => {
-    setParams(prev => ({ ...prev, ...updates }));
-    setValidationErrors([]); // Clear errors saat update
-  }, []);
-
-  const runSimulation = useCallback(async () => {
-    // Validasi parameter
-    const validation = simulationService.validateParams(params);
+  /**
+   * Fungsi utama untuk menjalankan simulasi manual
+   * @param params Parameter input dari pengguna (Magnitudo, Kedalaman, Koordinat)
+   */
+  const runManualSimulation = async (params: SimulationParams) => {
+    // 1. Validasi Input di sisi Client
+    const validation = validateSimulationParams(params);
     
     if (!validation.valid) {
-      setValidationErrors(validation.errors);
+      // Tampilkan pesan error pertama jika validasi gagal
+      setError(validation.errors[0]);
       return;
     }
 
     setLoading(true);
     setError(null);
-    setValidationErrors([]);
 
     try {
-      const simulationResult = await simulationService.runSimulation(params);
-      setResult(simulationResult);
+      // 2. Panggil Service untuk request ke Backend (atau Mock Data)
+      const data = await simulationService.runSimulation(params);
+      setResult(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Simulasi gagal';
-      setError(errorMessage);
-      console.error('Simulation error:', err);
+      console.error("Simulation failed:", err);
+      setError('Gagal menjalankan simulasi. Periksa koneksi atau coba lagi nanti.');
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  };
 
-  const resetSimulation = useCallback(() => {
-    setParams({
-      magnitude: 0,
-      depth: 0,
-      latitude: 0,
-      longitude: 0
-    });
+  /**
+   * Reset state simulasi ke kondisi awal
+   */
+  const resetSimulation = () => {
     setResult(null);
     setError(null);
-    setValidationErrors([]);
-  }, []);
+    setLoading(false);
+  };
 
   return {
-    params,
-    result,
     loading,
+    result,
     error,
-    updateParams,
-    runSimulation,
-    resetSimulation,
-    validationErrors
+    runManualSimulation,
+    resetSimulation
   };
 };

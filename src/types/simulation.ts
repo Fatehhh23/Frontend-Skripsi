@@ -1,60 +1,37 @@
 // src/types/simulation.ts
-// Types untuk simulasi tsunami
 
-export interface SimulationParams {
-  magnitude: number;
-  depth: number;
-  latitude: number;
-  longitude: number;
-}
-
-export interface SimulationResult {
-  riskLevel: RiskLevel;
-  eta: number; // Estimated Time of Arrival (minutes)
-  maxWaveHeight: number; // meters
-  impactArea: number; // km²
-  waveTrend: WaveTrendPoint[];
-  confidenceScore?: number;
-  affectedRegions?: string[];
-}
-
+// Level risiko tsunami (sesuai dengan konstanta warna)
 export type RiskLevel = 'Rendah' | 'Sedang' | 'Tinggi' | 'Bahaya';
 
+// Parameter input dari user atau data gempa
+export interface SimulationParams {
+  magnitude: number; // Skala Richter
+  depth: number;     // Kilometer
+  latitude: number;  // Derajat desimal
+  longitude: number; // Derajat desimal
+}
+
+// Struktur titik data untuk grafik tren gelombang
 export interface WaveTrendPoint {
-  time: string;
-  height: number;
-  location?: string;
+  time: string;   // Label waktu (misal: "T+10")
+  height: number; // Tinggi air dalam meter
 }
 
-export interface ValidationResult {
-  valid: boolean;
-  errors: string[];
+// Hasil lengkap simulasi dari Model AI/Backend
+export interface SimulationResult {
+  riskLevel: RiskLevel;
+  eta: number;            // Estimasi waktu tiba (menit)
+  maxWaveHeight: number;  // Tinggi gelombang maksimum (meter)
+  impactArea: number;     // Luas area terdampak (km²)
+  waveTrend: WaveTrendPoint[]; // Array data untuk grafik
+  confidenceScore?: number; // Tingkat kepercayaan model (0.0 - 1.0)
+  affectedRegions?: string[]; // Nama daerah yang terdampak (opsional)
 }
 
+// Struktur history simulasi (jika disimpan)
 export interface SimulationHistory {
   id: string;
   timestamp: string;
   params: SimulationParams;
   result: SimulationResult;
-  userId?: string;
-}
-
-export interface RealTimeData {
-  timestamp: string;
-  location: string;
-  params: SimulationParams;
-  result: SimulationResult;
-  source: 'BMKG' | 'USGS' | 'Manual';
-}
-
-export interface EarthquakeData {
-  id: string;
-  magnitude: number;
-  depth: number;
-  latitude: number;
-  longitude: number;
-  time: string;
-  location: string;
-  source: string;
-  isTsunamigenic?: boolean;
 }

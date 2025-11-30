@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-interface User {
-  email: string;
-  name: string;
-}
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -17,9 +12,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
 
-  // Cek status login saat aplikasi dimuat (persistence)
+  // Cek LocalStorage saat aplikasi dimuat agar user tetap login saat refresh
   useEffect(() => {
     const storedUser = localStorage.getItem('avatar_user');
     if (storedUser) {
@@ -28,16 +22,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = (email: string, name: string) => {
-    const newUser = { email, name };
+    // Simulasi login sukses
+    const newUser: User = { email, name, role: 'user' };
     setUser(newUser);
     localStorage.setItem('avatar_user', JSON.stringify(newUser));
-    navigate('/dashboard'); // Redirect ke dashboard setelah login
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('avatar_user');
-    navigate('/login'); // Redirect ke login setelah logout
   };
 
   return (

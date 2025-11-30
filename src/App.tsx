@@ -1,5 +1,6 @@
+// src/App.tsx
 import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/Home';
@@ -10,7 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Komponen ScrollToTop
+// Komponen utilitas untuk scroll ke atas saat pindah halaman
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -19,26 +20,25 @@ const ScrollToTop = () => {
   return null;
 };
 
-// PERBAIKAN DI SINI: Menggunakan React.ReactNode menggantikan JSX.Element
+// Komponen Pelindung Route (Hanya user login yang bisa akses)
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
-  const location = useLocation();
-
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
-
-  // Menggunakan fragment (<>) untuk memastikan return type valid
   return <>{children}</>;
 };
 
 const App: React.FC = () => {
   return (
+    // Menggunakan HashRouter agar aman saat di-deploy (misal ke GitHub Pages)
     <HashRouter>
       <AuthProvider>
         <ScrollToTop />
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-900">
           <Navbar />
+          
+          {/* Main Content dengan padding-top untuk kompensasi Navbar Fixed */}
           <main className="flex-grow pt-16">
             <Routes>
               {/* Rute Publik */}
@@ -48,7 +48,7 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
-              {/* Rute Privat */}
+              {/* Rute Privat (Dashboard) */}
               <Route 
                 path="/dashboard" 
                 element={
@@ -57,8 +57,12 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 } 
               />
+
+              {/* Fallback untuk halaman 404 */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
+          
           <Footer />
         </div>
       </AuthProvider>

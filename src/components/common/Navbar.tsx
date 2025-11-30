@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+
+// PERBAIKAN 1: Gunakan alias '@' agar jalur import selalu benar, tidak peduli lokasi filenya
+import { useAuth } from '@/context/AuthContext';
+
+// PERBAIKAN 2: Import gambar logo langsung dari lokasinya di src
+// Ini menjamin gambar tetap muncul meskipun folder public berubah saat build
+import logoAvatar from '@/public/assets/logo-avatar.png';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, logout, user } = useAuth();
 
-  // Pastikan file logo ada di folder: public/assets/logo-avatar.png
-  const LOGO_PATH = '/assets/logo-avatar.png'; 
+  // Gunakan variabel hasil import
+  const LOGO_PATH = logoAvatar; 
 
   const navLinks = [
     { name: 'Beranda', path: '/' },
@@ -25,15 +31,11 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           
-          {/* === LOGO SECTION (Sesuai Request Struktur) === */}
+          {/* === LOGO SECTION === */}
           <Link to="/" className="flex items-center gap-3 group">
             
-            {/* Container Logo dengan Struktur Custom Anda */}
-            {/* Ukuran disesuaikan ke w-12 h-12 (48px) agar muat di navbar. 
-                Jika ingin sedikit lebih besar, ubah ke w-14 h-14 atau w-16 h-16 */}
             <div className="relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 group-hover:scale-105">
-              
-              {/* Efek Glow / Blur di belakang (Sesuai request) */}
+              {/* Efek Glow */}
               <div className="absolute inset-0 bg-blue-400 rounded-full blur-lg opacity-40 animate-pulse group-hover:opacity-60 transition-opacity"></div>
               
               {/* Gambar Logo */}
@@ -42,7 +44,6 @@ const Navbar: React.FC = () => {
                 alt="AVATAR Logo" 
                 className="relative w-full h-full object-contain drop-shadow-lg z-10"
                 onError={(e) => {
-                  // Fallback jika gambar tidak ditemukan
                   (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).parentElement?.classList.add('bg-blue-100');
                 }}
@@ -54,7 +55,6 @@ const Navbar: React.FC = () => {
               AVATAR
             </span>
           </Link>
-
 
           {/* === DESKTOP NAVIGATION === */}
           <div className="hidden md:flex items-center space-x-8">
